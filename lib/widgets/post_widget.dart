@@ -1,11 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:infinite_scroll/models/post.dart' show Post;
+import 'package:flutter_tutorial/models/post.dart' show Post;
 
 /// [PostWidget].
 class PostWidget extends StatelessWidget {
   const PostWidget({Key key, @required this.post}) : super(key: key);
 
   final Post post;
+
+  // Separators.
+  Widget get _vSpace => const SizedBox(height: 8.0);
+  Widget get _hSpace => const SizedBox(width: 8.0);
+
+  Color _color(String keyword) {
+    switch (keyword) {
+      case 'red':
+        return Colors.red.shade300;
+      case 'brown':
+        return Colors.brown.shade400;
+      case 'green':
+        return Colors.green.shade200;
+      case 'blue':
+        return Colors.blue.shade200;
+      case 'yellow':
+        return Colors.yellow.shade200;
+        break;
+      default:
+        return Colors.grey.shade300;
+    }
+  }
 
   /// build.
   @override
@@ -19,12 +41,12 @@ class PostWidget extends StatelessWidget {
             child: Row(
               children: [
                 Icon(Icons.verified, color: Colors.blue),
-                const SizedBox(width: 8.0),
+                _hSpace,
                 Text(post.user, style: TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
           ),
-          const SizedBox(height: 8.0),
+          _vSpace,
           Image.network(
             this.post.image,
             height: 300,
@@ -49,9 +71,14 @@ class PostWidget extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 8.0),
+          _vSpace,
           Text(this.post.description),
-          const SizedBox(height: 8.0),
+          _vSpace,
+          Chip(
+            label: Text(this.post.keyword),
+            backgroundColor: _color(this.post.keyword),
+          ),
+          _vSpace,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

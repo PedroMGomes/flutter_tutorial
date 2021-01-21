@@ -12,16 +12,19 @@ class Post {
 
   final String description;
 
+  final String keyword;
+
   /// [Post].
-  const Post(this.user, this.image, this.description);
+  const Post(this.user, this.image, this.description, this.keyword);
 
   /// Fake Post.
   factory Post.fake() {
     final user = faker.person.name();
+    final description = faker.lorem.sentence();
+    // Get a random keyword from the _randomKeywordList.
     final keyword = _randomKeywordList.elementAt(
         faker.randomGenerator.integer(_randomKeywordList.length, min: 0));
     final image = 'https://source.unsplash.com/random/?$keyword';
-    final description = faker.lorem.sentence();
-    return Post(user, image, description);
+    return Post(user, image, description, keyword);
   }
 }
