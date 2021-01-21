@@ -1,4 +1,4 @@
-package com.pedrogomes.infinite_scroll
+package com.pedrogomes.flutter_tutorial
 
 import io.flutter.embedding.android.FlutterActivity
 
