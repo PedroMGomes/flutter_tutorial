@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tutorial/widgets/infinite_list.dart';
+import 'package:flutter_tutorial/widgets/infinite_list.dart' show InfiniteList;
 import 'package:google_fonts/google_fonts.dart' show GoogleFonts;
 
 void main() => runApp(MyApp());
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Scaffold(
-        appBar: AppBar(title: const Text('Infinite List')),
+        // appBar: AppBar(title: const Text('Infinite List')),
         body: SafeArea(child: Center(child: InfiniteList())),
       ),
     );

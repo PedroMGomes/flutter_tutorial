@@ -25,7 +25,7 @@ class PostServer {
                 post.keyword.contains(keywordFilter.trim().toLowerCase()))
             .toList();
     final t = offset + limit;
-    final end = (_postList.length > t) ? t : _postList.length - offset;
+    final end = (arr.length > t) ? t : arr.length;
     return arr.getRange(offset, end).toList();
   }
 }

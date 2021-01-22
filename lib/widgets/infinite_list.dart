@@ -3,16 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/post.dart' show Post;
 import 'package:flutter_tutorial/server/post_server.dart' show PostServer;
 import 'package:flutter_tutorial/widgets/post_widget.dart' show PostWidget;
-import 'dart:developer' as developer;
 
 /// [InfiniteList].
 class InfiniteList extends StatefulWidget {
-  InfiniteList({
-    Key key,
-    this.duration = const Duration(milliseconds: 256),
-  }) : super(key: key);
-
-  final Duration duration;
+  InfiniteList({Key key}) : super(key: key);
 
   @override
   _InfiniteListState createState() => _InfiniteListState();
@@ -26,42 +20,50 @@ class _InfiniteListState extends State<InfiniteList> {
   double _lastMaxExtent = 0.0;
   final ScrollController _scrollController = ScrollController();
 
-  Timer _timer;
+  static const Duration _duration = Duration(seconds: 1);
+  Timer _timer = Timer(_duration, () {});
   final TextEditingController _textController = TextEditingController();
+  String _lastSearchTerm = '';
 
   /// Apply Search.
-  void _applySearch() {
+  void _search() {
     if (this._timer.isActive) this._timer.cancel();
-    this._timer =
-        Timer(this.widget.duration, () => setState(() => this._updateList()));
+    this._timer = Timer(_duration, () {
+      // Only fetch new data if input has changed from last request.
+      if (this._lastSearchTerm != this._textController.text) {
+        setState(() {
+          this._scrollController.jumpTo(0);
+          this._lastSearchTerm = this._textController.text;
+          this._postList = PostServer.get(
+            offset: 0,
+            limit: 20,
+            keywordFilter: this._textController.text,
+          );
+        });
+      }
+    });
   }
 
   /// Reset List.
   void _clearSearch() {
     this._timer.cancel();
     this._textController.clear();
-    // Remove keyboard (Text Field focus).
+    // Unfocus Text Field and dismisses keyboard.
     FocusScope.of(context).unfocus();
-    // Resets List.
-    setState(() => this._postList = PostServer.get(offset: 0, limit: 20));
-  }
-
-  /// Update List.
-  void _updateList() {
-    setState(() {
-      this._postList = PostServer.get(
-        offset: this._postList.length,
-        limit: 20,
-        keywordFilter: this._textController.text,
-      );
-    });
+    if (this._lastSearchTerm.isNotEmpty) {
+      setState(() {
+        // Jumps to initial scroll position.
+        this._scrollController.jumpTo(0);
+        this._lastSearchTerm = '';
+        this._postList = PostServer.get(offset: 0, limit: 20);
+      });
+    }
   }
 
   /// init.
   @override
   void initState() {
     super.initState();
-    this._timer = Timer(this.widget.duration, () {});
     this._postList = PostServer.get(offset: 0, limit: 20);
     this._scrollController
       ..addListener(() {
@@ -74,7 +76,11 @@ class _InfiniteListState extends State<InfiniteList> {
           // Adding new elements to the List and updating this widget state.
           setState(() {
             this._lastMaxExtent = maxExtent;
-            this._updateList();
+            this._postList.addAll(PostServer.get(
+                  offset: this._postList.length,
+                  limit: 20,
+                  keywordFilter: this._textController.text,
+                ));
           });
         }
       });
@@ -93,10 +99,23 @@ class _InfiniteListState extends State<InfiniteList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
+      child: Stack(
+        alignment: Alignment.topCenter,
         children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: ListView.builder(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              controller: this._scrollController,
+              itemCount: this._postList.length,
+              itemBuilder: (context, index) => PostWidget(
+                post: this._postList.elementAt(index),
+              ),
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Card(
               elevation: 8.0,
               child: TextField(
@@ -107,6 +126,7 @@ class _InfiniteListState extends State<InfiniteList> {
                 textInputAction: TextInputAction.search,
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
+                  hintText: 'Search color',
                   prefixIcon: Icon(Icons.search, color: Colors.blueGrey),
                   suffixIcon: IconButton(
                     onPressed: () => this._clearSearch(),
@@ -114,16 +134,7 @@ class _InfiniteListState extends State<InfiniteList> {
                   ),
                   border: InputBorder.none,
                 ),
-                onChanged: (_) => this._applySearch(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              controller: this._scrollController,
-              itemCount: this._postList.length,
-              itemBuilder: (context, index) => PostWidget(
-                post: this._postList.elementAt(index),
+                onChanged: (_) => this._search(),
               ),
             ),
           ),

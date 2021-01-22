@@ -23,7 +23,6 @@ class PostWidget extends StatelessWidget {
         return Colors.blue.shade200;
       case 'yellow':
         return Colors.yellow.shade200;
-        break;
       default:
         return Colors.grey.shade300;
     }
