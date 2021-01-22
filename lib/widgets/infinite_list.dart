@@ -50,9 +50,10 @@ class _InfiniteListState extends State<InfiniteList> {
   void _updateList() {
     setState(() {
       this._postList = PostServer.get(
-          offset: this._postList.length,
-          limit: 20,
-          keywordFilter: this._textController.text);
+        offset: this._postList.length,
+        limit: 20,
+        keywordFilter: this._textController.text,
+      );
     });
   }
 

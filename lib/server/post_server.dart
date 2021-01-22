@@ -26,6 +26,6 @@ class PostServer {
             .toList();
     final t = offset + limit;
     final end = (_postList.length > t) ? t : _postList.length - offset;
-    return arr.getRange(offset, end);
+    return arr.getRange(offset, end).toList();
   }
 }
