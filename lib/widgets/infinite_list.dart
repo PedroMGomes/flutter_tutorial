@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/post.dart' show Post;
+import 'package:flutter_tutorial/server/post_server.dart' show PostServer;
 import 'package:flutter_tutorial/widgets/post_widget.dart' show PostWidget;
 import 'dart:developer' as developer;
-
-List<Post> postBackend =
-    List.generate(100, (index) => Post.fake(), growable: false);
 
 /// [InfiniteList].
 class InfiniteList extends StatefulWidget {
@@ -22,7 +20,6 @@ class InfiniteList extends StatefulWidget {
 
 /// [_InfiniteListState].
 class _InfiniteListState extends State<InfiniteList> {
-  static const pageLimit = 20;
   List<Post> _postList;
 
   /// Last List View Max Extent value.
@@ -45,25 +42,18 @@ class _InfiniteListState extends State<InfiniteList> {
     this._textController.clear();
     // Remove keyboard (Text Field focus).
     FocusScope.of(context).unfocus();
-    // Reset List.
-    setState(
-        () => this._postList = postBackend.getRange(0, pageLimit).toList());
+    // Resets List.
+    setState(() => this._postList = PostServer.get(offset: 0, limit: 20));
   }
 
   /// Update List.
   void _updateList() {
-    final tempList = (this._textController.text.isEmpty)
-        ? postBackend
-        : postBackend
-            .where((post) => post.keyword
-                .contains(this._textController.text.trim().toLowerCase()))
-            .toList();
-    final end = ((tempList.length - this._postList.length) > pageLimit)
-        ? pageLimit
-        : tempList.length - this._postList.length;
-    this._postList.addAll(
-        tempList.getRange(this._postList.length, this._postList.length + end));
-    developer.log(this._postList.length.toString());
+    setState(() {
+      this._postList = PostServer.get(
+          offset: this._postList.length,
+          limit: 20,
+          keywordFilter: this._textController.text);
+    });
   }
 
   /// init.
@@ -71,7 +61,7 @@ class _InfiniteListState extends State<InfiniteList> {
   void initState() {
     super.initState();
     this._timer = Timer(this.widget.duration, () {});
-    this._postList = postBackend.getRange(0, pageLimit).toList();
+    this._postList = PostServer.get(offset: 0, limit: 20);
     this._scrollController
       ..addListener(() {
         // N pixels to offset ListView children on the opposite direction.
