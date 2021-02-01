@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/post.dart' show Post;
+import 'package:flutter_tutorial/providers/posts_provider.dart'
+    show PostsProvider;
+import 'package:provider/provider.dart';
 
 /// [PostWidget].
 class PostWidget extends StatelessWidget {
@@ -28,6 +31,32 @@ class PostWidget extends StatelessWidget {
     }
   }
 
+  void _save(BuildContext context) {
+    final res = context.read<PostsProvider>().toggle(this.post);
+    final message = (res) ? 'Post Saved' : 'Post Removed';
+    final icon = (res)
+        ? Icon(Icons.check_circle, color: Colors.green)
+        : Icon(Icons.remove_circle, color: Colors.red);
+
+    // Displays Snackbar.
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(message),
+          const SizedBox(width: 8.0),
+          icon,
+        ],
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: const BorderRadius.only(
+            topLeft: const Radius.circular(8.0),
+            topRight: const Radius.circular(8.0)),
+      ),
+      duration: const Duration(seconds: 1),
+    ));
+  }
+
   /// build.
   @override
   Widget build(BuildContext context) {
@@ -54,7 +83,7 @@ class PostWidget extends StatelessWidget {
               height: 300,
               width: double.infinity,
               color: Colors.blueGrey,
-              child: const Text('Failed to load image.'),
+              child: const Center(child: const Text('Failed to load image.')),
             ),
             frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
               // Same as the example provided in the official docs.
@@ -86,7 +115,7 @@ class PostWidget extends StatelessWidget {
                   onPressed: () {}),
               IconButton(
                   icon: Icon(Icons.bookmark_border, color: Colors.green),
-                  onPressed: () {}),
+                  onPressed: () => this._save(context)),
               IconButton(
                   icon: Icon(Icons.account_circle, color: Colors.blue),
                   onPressed: () {}),

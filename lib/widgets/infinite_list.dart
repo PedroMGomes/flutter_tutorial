@@ -102,20 +102,18 @@ class _InfiniteListState extends State<InfiniteList> {
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: ListView.builder(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              controller: this._scrollController,
-              itemCount: this._postList.length,
-              itemBuilder: (context, index) => PostWidget(
-                post: this._postList.elementAt(index),
-              ),
-            ),
+          ListView.builder(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            controller: this._scrollController,
+            itemCount: this._postList.length + 1,
+            itemBuilder: (context, index) => (index == 0)
+                ? const SizedBox(height: 64.0)
+                : PostWidget(
+                    post: this._postList.elementAt(index),
+                  ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
             child: Card(
               elevation: 8.0,
               child: TextField(
@@ -127,10 +125,10 @@ class _InfiniteListState extends State<InfiniteList> {
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: 'Search color',
-                  prefixIcon: Icon(Icons.search, color: Colors.blueGrey),
+                  prefixIcon: Icon(Icons.search, color: Colors.blue),
                   suffixIcon: IconButton(
                     onPressed: () => this._clearSearch(),
-                    icon: Icon(Icons.clear, color: Colors.blueGrey),
+                    icon: Icon(Icons.clear, color: Colors.blue),
                   ),
                   border: InputBorder.none,
                 ),
